@@ -1,0 +1,14 @@
+{
+    "appName": "PPOB",
+    "database": {
+        "host": "",
+        "user": "",
+        "password": "",
+        "port": "",
+        "database": ""
+    },
+    "secretKey": {
+        "jwt": "huhah"
+    },
+    "appPort": "3000"
+}
