@@ -3,22 +3,24 @@ package main
 import (
 	"api-ppob/database"
 	"api-ppob/routers"
+	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+
+	if err := godotenv.Load(); err != nil {
+		panic("Error loading .env file")
+	}
+
 	r := gin.Default()
 
 	routers.InitRoutes(r)
-	viper.SetConfigType("json")
-	viper.AddConfigPath(".")
-	viper.SetConfigName("config")
-	viper.ReadInConfig()
 
 	database.Init()
 	database.Connect()
-	r.Run(":" + viper.GetString("appPort"))
+	r.Run(":" + os.Getenv("APP_PORT"))
 
 }
