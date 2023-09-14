@@ -2,6 +2,7 @@ package routers
 
 import (
 	"api-ppob/app/controllers"
+	"api-ppob/app/middlewares"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -22,7 +23,12 @@ func InitRoutes(route *gin.Engine) {
 	})
 
 	route.POST("/login", controllers.LoginUser)
-
 	route.POST("/registration", controllers.RegisterUser)
+
+	auth := route.Group("/")
+	auth.Use(middlewares.CheckUser())
+	{
+		auth.GET("/profile", controllers.ProfileUser)
+	}
 
 }

@@ -4,9 +4,10 @@ import (
 	"api-ppob/app/models"
 	"api-ppob/app/utils"
 	"api-ppob/database"
+	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -21,6 +22,12 @@ type Register struct {
 	Email      string `json:"email" validate:"required,email,max=96"`
 	Password   string `json:"password" validate:"required,min=8,eqfield=RePassword"`
 	RePassword string `json:"repassword" validate:"required,min=8,max=48"`
+}
+
+type ProfileData struct {
+	Email     string `json:"email"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
 }
 
 func RegisterUser(c *gin.Context) {
@@ -94,6 +101,10 @@ func RegisterUser(c *gin.Context) {
 }
 
 func LoginUser(c *gin.Context) {
+	if err := godotenv.Load(); err != nil {
+		panic("Error loading .env file")
+	}
+
 	var dataInput Login
 
 	if err := c.ShouldBindJSON(&dataInput); err != nil {
@@ -145,7 +156,7 @@ func LoginUser(c *gin.Context) {
 		"email": user.Email,
 	}
 
-	token, err := utils.Sign(dataClaims, viper.GetString("secretKey.jwt"), 3600)
+	token, err := utils.Sign(dataClaims, os.Getenv("JWT_SECRET_KEY"), 3600)
 
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -165,4 +176,20 @@ func LoginUser(c *gin.Context) {
 	})
 
 	return
+}
+
+func ProfileUser(c *gin.Context) {
+	user := utils.GetUser(c)
+
+	profileData := ProfileData{
+		FirstName: user.First_Name,
+		LastName:  user.Last_Name,
+		Email:     user.Email,
+	}
+
+	c.JSON(200, gin.H{
+		"status":  200,
+		"message": "Login berhasil",
+		"data":    profileData,
+	})
 }

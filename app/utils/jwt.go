@@ -2,13 +2,14 @@ package utils
 
 import (
 	"encoding/json"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 // metadata for your jwt
@@ -98,8 +99,11 @@ func DecodeToken(accessToken *jwt.Token) AccessToken {
 }
 
 func GetUserFromToken(c *gin.Context) string {
+	if err := godotenv.Load(); err != nil {
+		panic("Error loading .env file")
+	}
 
-	getToken, _ := VerifyTokenHeader(c, viper.GetString("secret.user"))
+	getToken, _ := VerifyTokenHeader(c, os.Getenv("JWT_SECRET_KEY"))
 
 	decodeToken := DecodeToken(getToken)
 	return decodeToken.Claims.Email
